@@ -19,26 +19,13 @@ public:
 		sAppName = L"Chip8 Emulator";
 	}
 
-private:
-	short ClassifyPixel(uint8_t c)
-	{
-		short col;
-
-		if (c > 125)
-			col = FG_WHITE | BG_WHITE;
-		else
-			col = FG_BLACK | BG_BLACK;
-
-		return col;
-	}
-
 protected:
 	bool OnUserCreate() override
 	{
-		if (!cpu.load_rom("roms/invaders.ch8"))
+		if (!emu.load_rom("roms/invaders.ch8"))
 			return false;
 
-		cpu.set_audio(PlaySoundWrap);
+		emu.set_audio(PlaySoundWrap);
 
 		return true;
 	}
@@ -47,25 +34,25 @@ protected:
 	{
 		int32_t key = -1;
 
-		if (GetKey(L'X').bHeld) key = 0;
-		if (GetKey(L'1').bHeld) key = 1;
-		if (GetKey(L'2').bHeld) key = 2;
-		if (GetKey(L'3').bHeld) key = 3;
-		if (GetKey(L'Q').bHeld) key = 4;
-		if (GetKey(L'W').bHeld) key = 5;
-		if (GetKey(L'E').bHeld) key = 6;
-		if (GetKey(L'A').bHeld) key = 7;
-		if (GetKey(L'S').bHeld) key = 8;
-		if (GetKey(L'D').bHeld) key = 9;
-		if (GetKey(L'Z').bHeld) key = 10;
-		if (GetKey(L'C').bHeld) key = 11;
-		if (GetKey(L'K').bHeld) key = 12;
-		if (GetKey(L'R').bHeld) key = 13;
-		if (GetKey(L'F').bHeld) key = 14;
-		if (GetKey(L'V').bHeld) key = 15;
+		if (GetKey(L'X').bPressed) key = 0;
+		if (GetKey(L'1').bPressed) key = 1;
+		if (GetKey(L'2').bPressed) key = 2;
+		if (GetKey(L'3').bPressed) key = 3;
+		if (GetKey(L'Q').bPressed) key = 4;
+		if (GetKey(L'W').bPressed) key = 5;
+		if (GetKey(L'E').bPressed) key = 6;
+		if (GetKey(L'A').bPressed) key = 7;
+		if (GetKey(L'S').bPressed) key = 8;
+		if (GetKey(L'D').bPressed) key = 9;
+		if (GetKey(L'Z').bPressed) key = 10;
+		if (GetKey(L'C').bPressed) key = 11;
+		if (GetKey(L'K').bPressed) key = 12;
+		if (GetKey(L'R').bPressed) key = 13;
+		if (GetKey(L'F').bPressed) key = 14;
+		if (GetKey(L'V').bPressed) key = 15;
 
 		if (key != -1)
-			cpu.key_pressed(key);
+			emu.press_key(key);
 
 		key = -1;
 
@@ -87,39 +74,38 @@ protected:
 		if (GetKey(L'V').bReleased) key = 15;
 
 		if (key != -1)
-			cpu.key_released(key);
+			emu.release_key(key);
 
-		cpu.decrease_timers();
+		emu.decrease_timers();
 
-		cpu.next_opcode();
+		emu.next_opcode();
 
-		switch (cpu.opcode & 0xF000)
+		switch (emu.opcode & 0xF000)
 		{
-		case 0x0000: cpu.decode_opcode_0(); break;
-		case 0x1000: cpu.op_1NNN();			break;
-		case 0x2000: cpu.op_2NNN();			break;
-		case 0x3000: cpu.op_3XNN();			break;
-		case 0x4000: cpu.op_4XNN();			break;
-		case 0x5000: cpu.op_5XY0();			break;
-		case 0x6000: cpu.op_6XNN();			break;
-		case 0x7000: cpu.op_7XNN();			break;
-		case 0x8000: cpu.decode_opcode_8(); break;
-		case 0x9000: cpu.op_9XY0();			break;
-		case 0xA000: cpu.op_ANNN();			break;
-		case 0xB000: cpu.op_BNNN();			break;
-		case 0xC000: cpu.op_CXNN();			break;
-		case 0xD000: cpu.op_DXYN();			break;
-		case 0xE000: cpu.decode_opcode_e(); break;
-		case 0xF000: cpu.decode_opcode_f(); break;
+		case 0x0000: emu.decode_opcode_0(); break;
+		case 0x1000: emu.op_1NNN();			break;
+		case 0x2000: emu.op_2NNN();			break;
+		case 0x3000: emu.op_3XNN();			break;
+		case 0x4000: emu.op_4XNN();			break;
+		case 0x5000: emu.op_5XY0();			break;
+		case 0x6000: emu.op_6XNN();			break;
+		case 0x7000: emu.op_7XNN();			break;
+		case 0x8000: emu.decode_opcode_8(); break;
+		case 0x9000: emu.op_9XY0();			break;
+		case 0xA000: emu.op_ANNN();			break;
+		case 0xB000: emu.op_BNNN();			break;
+		case 0xC000: emu.op_CXNN();			break;
+		case 0xD000: emu.op_DXYN();			break;
+		case 0xE000: emu.decode_opcode_e(); break;
+		case 0xF000: emu.decode_opcode_f(); break;
 		}
 
-		for (int x = 0; x < cpu.screen_width; x++)
-			for (int y = 0; y < cpu.screen_height; y++)
+		for (int x = 0; x < emu.screen_width; x++)
+			for (int y = 0; y < emu.screen_height; y++)
 			{
 				Draw(
-					x, y,
-					PIXEL_SOLID,
-					ClassifyPixel(cpu.screen[y * cpu.screen_width + x])
+					x, y, PIXEL_SOLID,
+					(emu.screen[y * emu.screen_width + x] > 125) ? (FG_WHITE | BG_WHITE) : (FG_BLACK | BG_BLACK)
 				);
 			}
 
@@ -127,7 +113,7 @@ protected:
 	}
 
 private:
-	chip8 cpu;
+	chip8 emu;
 	
 };
 
