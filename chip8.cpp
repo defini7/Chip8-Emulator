@@ -64,15 +64,13 @@ void chip8::decrease_timers()
 
 int32_t chip8::get_key_pressed()
 {
-	int32_t state = -1;
-
 	for (int k = 0; k < 16; k++)
 	{
 		if (key_state[k] > 0)
 			return k;
 	}
 
-	return state;
+	return -1;
 }
 
 void chip8::op_00E0()
@@ -569,12 +567,12 @@ void chip8::decode_opcode_f()
 	}
 }
 
-void chip8::key_pressed(int key)
+void chip8::press_key(int key)
 {
 	key_state[key] = 1;
 }
 
-void chip8::key_released(int key)
+void chip8::release_key(int key)
 {
 	key_state[key] = 0;
 }
