@@ -58,7 +58,7 @@ void chip8::decrease_timers()
 	if (sound_timer > 0)
 	{
 		sound_timer--;
-		// play sound
+		play_sound();
 	}
 }
 
@@ -577,4 +577,9 @@ void chip8::key_pressed(int key)
 void chip8::key_released(int key)
 {
 	key_state[key] = 0;
+}
+
+void chip8::set_audio(bool (*sound_handler)())
+{
+	play_sound = sound_handler;
 }
