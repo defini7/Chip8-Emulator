@@ -15,7 +15,28 @@ public:
 	}
 
 private:
-	void UpdateKeys()
+	short ClassifyPixel(uint8_t c)
+	{
+		short col;
+
+		if (c > 125)
+			col = FG_WHITE | BG_WHITE;
+		else
+			col = FG_BLACK | BG_BLACK;
+
+		return col;
+	}
+
+protected:
+	bool OnUserCreate() override
+	{
+		if (!cpu.load_rom("roms/particle_demo.ch8"))
+			return false;
+
+		return true;
+	}
+
+	bool OnUserUpdate(float fDeltaTime) override
 	{
 		int32_t key = -1;
 
@@ -39,6 +60,8 @@ private:
 		if (key != -1)
 			cpu.key_pressed(key);
 
+		key = -1;
+
 		if (GetKey(L'X').bReleased) key = 0;
 		if (GetKey(L'K').bReleased) key = 1;
 		if (GetKey(L'K').bReleased) key = 2;
@@ -58,45 +81,6 @@ private:
 
 		if (key != -1)
 			cpu.key_released(key);
-	}
-
-	void ClassifyPixel(float r, float g, float b, wchar_t& sym, short& fg_col, short& bg_col)
-	{
-		float luminance = 0.2987f * r + 0.5870f * g + 0.1140f * b;
-		int pixel_bw = (int)(luminance * 13.0f);
-		switch (pixel_bw)
-		{
-		case 0: bg_col = BG_BLACK; fg_col = FG_BLACK; sym = PIXEL_SOLID; break;
-
-		case 1: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_QUARTER; break;
-		case 2: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_HALF; break;
-		case 3: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_THREEQUARTERS; break;
-		case 4: bg_col = BG_BLACK; fg_col = FG_DARK_GREY; sym = PIXEL_SOLID; break;
-
-		case 5: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_QUARTER; break;
-		case 6: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_HALF; break;
-		case 7: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_THREEQUARTERS; break;
-		case 8: bg_col = BG_DARK_GREY; fg_col = FG_GREY; sym = PIXEL_SOLID; break;
-
-		case 9:  bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_QUARTER; break;
-		case 10: bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_HALF; break;
-		case 11: bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_THREEQUARTERS; break;
-		case 12: bg_col = BG_GREY; fg_col = FG_WHITE; sym = PIXEL_SOLID; break;
-		}
-	}
-
-protected:
-	bool OnUserCreate() override
-	{
-		if (!cpu.load_rom("pong.ch8"))
-			return false;
-
-		return true;
-	}
-
-	bool OnUserUpdate(float fDeltaTime) override
-	{
-		UpdateKeys();
 
 		cpu.decrease_timers();
 
@@ -125,18 +109,11 @@ protected:
 		for (int x = 0; x < cpu.screen_width; x++)
 			for (int y = 0; y < cpu.screen_height; y++)
 			{
-				wchar_t sym;
-				short bg_col;
-				short fg_col;
-
-				ClassifyPixel(
-					cpu.screen[y * cpu.screen_width + x].r / 255.0f,
-					cpu.screen[y * cpu.screen_width + x].g / 255.0f,
-					cpu.screen[y * cpu.screen_width + x].b / 255.0f,
-					sym, fg_col, bg_col
+				Draw(
+					x, y,
+					PIXEL_SOLID,
+					ClassifyPixel(cpu.screen[y * cpu.screen_width + x])
 				);
-
-				Draw(x, y, sym, fg_col | bg_col);
 			}
 
 		return true;
@@ -151,8 +128,12 @@ int main()
 {
 	Example demo;
 
-	if (demo.ConstructConsole(640, 320, 2, 2).ok)
+	rcode rc = demo.ConstructConsole(640, 320, 2, 2);
+
+	if (rc.ok)
 		demo.Run();
+	else
+		std::cerr << rc.info << '\n';
 
 	return 0;
 }
