@@ -45,6 +45,9 @@ public:
 	void key_pressed(int key);
 	void key_released(int key);
 
+	bool (*play_sound)();
+	void set_audio(bool (*sound_handler)());
+
 public:
 	// opcodes
 	void op_00E0();
