@@ -6,6 +6,11 @@
 
 using namespace def;
 
+bool PlaySoundWrap()
+{
+	return (bool)PlaySoundW(L"beep.wav", nullptr, SND_ASYNC | SND_FILENAME);
+}
+
 class Example : public def::ConsolaProd
 {
 public:
@@ -30,8 +35,10 @@ private:
 protected:
 	bool OnUserCreate() override
 	{
-		if (!cpu.load_rom("roms/particle_demo.ch8"))
+		if (!cpu.load_rom("roms/invaders.ch8"))
 			return false;
+
+		cpu.set_audio(PlaySoundWrap);
 
 		return true;
 	}
