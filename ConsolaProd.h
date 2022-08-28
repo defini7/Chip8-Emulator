@@ -796,7 +796,7 @@ namespace def
 		if (bLoop)
 			f |= SND_LOOP;
 
-		return (bool)PlaySoundW(sFilename.c_str(), nullptr, SND_ASYNC | SND_FILENAME);
+		return (bool)PlaySoundW(sFilename.c_str(), nullptr, f);
 	}
 
 	bool ConsolaProd::Focused()
