@@ -37,8 +37,8 @@ void chip8::reset()
 	memset(memory, 0, sizeof(memory));
 	memset(key_state, 0, sizeof(key_state));
 
-	delay_timer = 0.0f;
-	sound_timer = 0.0f;
+	delay_timer = 0;
+	sound_timer = 0;
 }
 
 void chip8::next_opcode()
@@ -79,11 +79,7 @@ void chip8::op_00E0()
 {
 	for (int x = 0; x < screen_width; x++)
 		for (int y = 0; y < screen_height; y++)
-		{
-			screen[y * screen_width + x] = {
-				255, 255, 255
-			};
-		}
+			screen[y * screen_width + x] = 255;
 }
 
 void chip8::op_00EE()
@@ -364,7 +360,7 @@ void chip8::op_DXYN()
 
 				int32_t colour = 0;
 
-				if (screen[spr_y * screen_width + spr_x].r == 0)
+				if (screen[spr_y * screen_width + spr_x] == 0)
 				{
 					colour = 255;
 					reg[15] = 1;
@@ -375,13 +371,7 @@ void chip8::op_DXYN()
 					for (int r = 0; r < scale; r++)
 					{
 						if (spr_y + r < screen_height && spr_x + c < screen_width && spr_x + c >= 0 && spr_y + r >= 0)
-						{
-							screen[(spr_y + r) * screen_width + (spr_x + c)] = {
-							(uint8_t)colour,
-							(uint8_t)colour,
-							(uint8_t)colour
-							};
-						}
+							screen[(spr_y + r) * screen_width + (spr_x + c)] = (uint8_t)colour;
 					}
 				}
 
