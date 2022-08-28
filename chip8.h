@@ -42,8 +42,8 @@ public:
 	void decrease_timers();
 
 	int32_t get_key_pressed();
-	void key_pressed(int key);
-	void key_released(int key);
+	void press_key(int key);
+	void release_key(int key);
 
 	bool (*play_sound)();
 	void set_audio(bool (*sound_handler)());
