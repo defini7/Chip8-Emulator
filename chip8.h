@@ -7,13 +7,6 @@
 
 #pragma warning(disable : 4996)
 
-struct RGB
-{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-};
-
 class chip8
 {
 public:
@@ -36,7 +29,7 @@ public: // system
 	const int32_t screen_height = 320;
 
 	// graphics
-	RGB screen[640 * 320];
+	uint8_t screen[640 * 320];
 
 	// controls
 	uint8_t key_state[16];
