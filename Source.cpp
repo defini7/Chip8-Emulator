@@ -1,8 +1,8 @@
-﻿#include <iostream>
+#include <iostream>
 
 #include "chip8.h"
 
-#include "ConsolaProd.h"
+#include "ConsoleGameEngine.h"
 
 using namespace def;
 
@@ -11,7 +11,7 @@ bool PlaySoundWrap()
 	return (bool)PlaySoundW(L"beep.wav", nullptr, SND_ASYNC | SND_FILENAME);
 }
 
-class Example : public def::ConsolaProd
+class Example : public def::ConsoleGameEngine
 {
 public:
 	Example()
